@@ -105,7 +105,7 @@ vim.opt.number = true
 -- vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
+vim.opt.mouse = ''
 
 -- Don't show the mode, since it's already in status line
 vim.opt.showmode = false
@@ -543,7 +543,12 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
-        --
+        eslint = {
+          settings = {
+            -- helps eslint find the eslintrc when it's placed in a subfolder instead of the cwd root
+            workingDirectories = { mode = 'auto' },
+          },
+        },
 
         lua_ls = {
           -- cmd = {...},
@@ -607,7 +612,7 @@ require('lazy').setup({
   { -- Autoformat
     'stevearc/conform.nvim',
     opts = {
-      notify_on_error = false,
+      notify_on_error = true,
       format_on_save = {
         timeout_ms = 500,
         lsp_fallback = true,
@@ -619,7 +624,10 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        javascript = { { 'eslint_d' } },
+        jsx = { { 'eslint_d' } },
+        typescript = { { 'eslint_d' } },
+        tsx = { { 'eslint_d' } },
       },
     },
   },
@@ -724,14 +732,24 @@ require('lazy').setup({
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
     'folke/tokyonight.nvim',
     priority = 1000, -- make sure to load this before all the other start plugins
-    init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+    opts = {
+      style = 'storm',
+      transparent = true,
+      styles = {
+        sidebars = 'transparent',
+        floats = 'transparent',
+      },
+    },
+    config = function(_, opts)
+      local tokyonight = require 'tokyonight'
+      -- Load the colorscheme here
       vim.cmd.colorscheme 'tokyonight-night'
 
       -- You can configure highlights by doing something like
       vim.cmd.hi 'Comment gui=none'
+
+      tokyonight.setup(opts)
+      tokyonight.load()
     end,
   },
 
@@ -817,7 +835,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you have a Nerd Font, set icons to an empty table which will use the
